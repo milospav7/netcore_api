@@ -48,7 +48,7 @@ namespace Tweetbook.Services
             };
 
             var createdUser = await _userManager.CreateAsync(newUser, password);
-
+       
             if (!createdUser.Succeeded)
             {
                 return new AuthenticationResult
@@ -56,6 +56,8 @@ namespace Tweetbook.Services
                     ErrorMessages = createdUser.Errors.Select(x => x.Description)
                 };
             }
+
+            /*await _userManager.AddClaimAsync(newUser, new Claim("hashtahs_manager", "true"));*/ // this is how we can add custom claim
 
             return await GenerateAuthneticationResultAsync(newUser);
         }
@@ -169,15 +171,20 @@ namespace Tweetbook.Services
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var claims = new List<Claim>
             {
-                Subject = new System.Security.Claims.ClaimsIdentity(new[]
-                {
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // token Id used for token validation
                     new Claim(JwtRegisteredClaimNames.Email, user.Email),
                     new Claim("id", user.Id)
-                }),
+            };
+
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            claims.AddRange(userClaims);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new System.Security.Claims.ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.Add(_jwtSettings.TokenLifeTime),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };

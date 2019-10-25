@@ -22,6 +22,11 @@ namespace Tweetbook.Contracts.V1
             public const string Create = Base + "/" + "posts";
         }
 
+        public static class Hashtags
+        {
+            public const string GetAll = Base + "/" + "hashtags";
+        }
+
         public static class Identity
         {
             public const string Login = Base + "/identity/login";

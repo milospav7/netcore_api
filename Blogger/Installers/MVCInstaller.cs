@@ -46,7 +46,13 @@ namespace Tweetbook.Installers
                 opt.TokenValidationParameters = tokenValidationParameters;
             });
 
-            services.AddAuthorization();
+            services.AddAuthorization(opt => 
+            {
+                opt.AddPolicy("HashtagsManager", builder =>
+                {
+                    builder.RequireClaim("hashtags_manager", "true");
+                });
+            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSwaggerGen(x =>
