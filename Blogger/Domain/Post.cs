@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Blogger.Domain;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,6 +17,8 @@ namespace Tweetbook.Domain
         public string Name { get; set; }
 
         public string UserId { get; set; }
+
+        public virtual IEnumerable<Tag> Tags { get; set; }
 
         [ForeignKey(nameof(UserId))]
         public IdentityUser User { get; set; }

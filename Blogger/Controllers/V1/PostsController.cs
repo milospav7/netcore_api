@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AutoMapper;
+using Blogger.Contracts.Responses;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Tweetbook.Contracts.Requests;
 using Tweetbook.Contracts.V1;
@@ -18,16 +22,19 @@ namespace Tweetbook.Controllers
     public class PostsController : Controller
     {
         private readonly IPostService _postService;
+        private readonly IMapper _mapper;
 
-        public PostsController(IPostService postService)
+        public PostsController(IPostService postService, IMapper mapper)
         {
             _postService = postService;
+            _mapper = mapper;
         }
 
         [HttpGet(ApiRoutes.Posts.GetAll)]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _postService.GetPostsAsync());
+            var posts = await _postService.GetPostsAsync();
+            return Ok(_mapper.Map<IEnumerable<PostResponse>>(posts));
         }
 
         [HttpGet(ApiRoutes.Posts.Get)]
@@ -43,7 +50,7 @@ namespace Tweetbook.Controllers
         [HttpGet(ApiRoutes.Posts.Update)]
         public async Task<IActionResult> Update([FromRoute]Guid postId, [FromBody]UpdatePost postToUpdate)
         {
-            var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId());
+            var userOwnsPost = await _postService.UserOwnsPostAsync(postId, this.HttpContext.GetUserId());
             if(userOwnsPost == false)
                 return BadRequest(new { Error = "You are not allowed to update this post." });
              
@@ -54,7 +61,7 @@ namespace Tweetbook.Controllers
             };
 
             if (await _postService.UpdatePostAsync(post))
-                return Ok();
+                return Ok(_mapper.Map<PostResponse>(post));
 
             return NotFound(); 
         }
@@ -72,7 +79,7 @@ namespace Tweetbook.Controllers
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
             var resourceUri = baseUrl + "/" + ApiRoutes.Posts.Get.Replace("{postId}", post.Id.ToString());
-            return Created(resourceUri, new PostResponse { Id = post.Id });
+            return Created(resourceUri, _mapper.Map<PostResponse>(post));
         }
 
         [HttpDelete]

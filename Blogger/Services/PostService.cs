@@ -33,7 +33,12 @@ namespace Tweetbook.Services
             _dataContext.Posts.Remove(post);
             var deleted = await _dataContext.SaveChangesAsync();
             return deleted > 0;
-        } 
+        }
+
+        public Task<object> GetAllHashtagsAsync()
+        {
+            throw new NotImplementedException();
+        }
 
         public async Task<Post> GetPostByIdAsync(Guid postId)
         {
