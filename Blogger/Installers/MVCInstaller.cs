@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blogger.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,7 +54,14 @@ namespace Tweetbook.Installers
                 {
                     builder.RequireClaim("hashtags_manager", "true");
                 });
+
+                opt.AddPolicy("BloggerEmployee", builder =>
+                {
+                    builder.AddRequirements(new BloggerEmployeeRequirement("blogger.com"));
+                });
             });
+
+            services.AddSingleton<IAuthorizationHandler, BloggerEmployeeHandler>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSwaggerGen(x =>
