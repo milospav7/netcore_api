@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 using Tweetbook.Options;
 using Tweetbook.Services;
+using FluentValidation.AspNetCore;
+using Blogger.Filters;
 
 namespace Tweetbook.Installers
 {
@@ -63,7 +65,13 @@ namespace Tweetbook.Installers
 
             services.AddSingleton<IAuthorizationHandler, BloggerEmployeeHandler>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc(opt => 
+                {
+                    opt.Filters.Add<ValidationFilter>();
+                })
+                .AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<Startup>())
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
             services.AddSwaggerGen(x =>
             {
                 x.SwaggerDoc("v1", new Info { Title = "Tweetbook API", Version = "v1" });
