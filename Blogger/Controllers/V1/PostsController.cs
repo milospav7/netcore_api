@@ -19,6 +19,7 @@ namespace Tweetbook.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Authorize(Policy = "BloggerEmployee")]
+    [Produces("application/json")]
     public class PostsController : Controller
     {
         private readonly IPostService _postService;
@@ -30,6 +31,9 @@ namespace Tweetbook.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Returns list of post.
+        /// </summary>
         [HttpGet(ApiRoutes.Posts.GetAll)]
         public async Task<IActionResult> GetAll()
         {
@@ -37,6 +41,14 @@ namespace Tweetbook.Controllers
             return Ok(_mapper.Map<IEnumerable<PostResponse>>(posts));
         }
 
+        /// <summary>
+        /// Returns post with passed Id.
+        /// </summary>
+        /// <remarks>
+        ///     Sample **request:**:
+        ///     GET /api/v1/posts
+        /// </remarks>
+        /// <param name="postId"></param>
         [HttpGet(ApiRoutes.Posts.Get)]
         public async Task<IActionResult> Get([FromRoute]Guid postId)
         {
@@ -47,6 +59,9 @@ namespace Tweetbook.Controllers
             return Ok(post);
         }
 
+        /// <summary>
+        /// Updates post that matches passed argument.
+        /// </summary>
         [HttpGet(ApiRoutes.Posts.Update)]
         public async Task<IActionResult> Update([FromRoute]Guid postId, [FromBody]UpdatePost postToUpdate)
         {
@@ -66,6 +81,9 @@ namespace Tweetbook.Controllers
             return NotFound(); 
         }
 
+        /// <summary>
+        /// Creates new post.
+        /// </summary>
         [HttpGet(ApiRoutes.Posts.Create)]
         public async Task<IActionResult> Create([FromBody]CreatePostRequest postRequest)
         {
@@ -82,6 +100,10 @@ namespace Tweetbook.Controllers
             return Created(resourceUri, _mapper.Map<PostResponse>(post));
         }
 
+        /// <summary>
+        /// Deletes post that matches passed argument.
+        /// </summary>
+        /// <param name="postId"></param>
         [HttpDelete]
         public async Task<IActionResult> Delete([FromRoute]Guid postId)
         {

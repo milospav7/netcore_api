@@ -71,25 +71,6 @@ namespace Tweetbook.Installers
                 })
                 .AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<Startup>())
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            services.AddSwaggerGen(x =>
-            {
-                x.SwaggerDoc("v1", new Info { Title = "Tweetbook API", Version = "v1" });
-
-                var security = new Dictionary<string, IEnumerable<string>>
-                {
-                    { "Bearer" , new string[0]}
-                };
-
-                x.AddSecurityDefinition("Bearer", new ApiKeyScheme
-                {
-                    Description = "JWT Authorization header using the bearer scheme",
-                    Name = "Authorization",
-                    In = "header",
-                    Type = "apiKey"
-                });
-                x.AddSecurityRequirement(security); 
-            });
         }
     }
 }
